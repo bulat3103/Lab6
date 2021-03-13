@@ -25,13 +25,14 @@ public class Client {
     public void run() throws IOException, ClassNotFoundException {
         Request requestToServer = null;
         Response serverResponse = null;
-        //try {
+        try {
             datagramChannel = DatagramChannel.open();
             address = new InetSocketAddress("localhost", this.port);
             datagramChannel.connect(address);
-            ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(16384);
             do {
-                requestToServer = console.interactiveMode();
+                requestToServer = serverResponse != null ? console.interactiveMode(serverResponse.getResponseCode()) :
+                        console.interactiveMode(null);
                 if (requestToServer.isEmpty()) continue;
                 byteBuffer.put(serialize(requestToServer));
                 byteBuffer.flip();
@@ -41,10 +42,10 @@ public class Client {
                 byteBuffer.flip();
                 serverResponse = deserialize(byteBuffer);
                 byteBuffer.clear();
-                System.out.println(serverResponse.getResponseBody());
+                System.out.print(serverResponse.getResponseBody());
             } while(!requestToServer.getCommandName().equals("exit"));
             System.out.println("Работа клиента успешно завершена!");
-        //} catch (Exception e) {}
+        } catch (Exception e) {}
     }
 
     private byte[] serialize(Request request) throws IOException {

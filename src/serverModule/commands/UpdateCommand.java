@@ -8,6 +8,7 @@ import common.exceptions.EmptyCollectionException;
 import common.exceptions.WrongAmountOfParametersException;
 import common.utility.SpaceMarineLite;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 import java.time.LocalDateTime;
 
@@ -55,7 +56,7 @@ public class UpdateCommand extends AbstractCommand{
                     weapon,
                     chapter
             ));
-            System.out.println("Успешно изменено!");
+            ResponseOutputer.append("Успешно изменено!\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
             System.out.println("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки");

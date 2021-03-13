@@ -1,11 +1,12 @@
 package common.data;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Chapter with marines.
  */
-public class Chapter {
+public class Chapter implements Serializable {
     private String name;
     private String parentLegion;
 

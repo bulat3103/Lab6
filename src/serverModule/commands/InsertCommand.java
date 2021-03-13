@@ -5,6 +5,7 @@ import common.exceptions.WrongAmountOfParametersException;
 import common.utility.SpaceMarineLite;
 import serverModule.utility.CollectionManager;
 import clientModule.utility.SpaceMarineBuilder;
+import serverModule.utility.ResponseOutputer;
 
 import java.time.LocalDateTime;
 
@@ -41,10 +42,10 @@ public class InsertCommand extends AbstractCommand{
                     marineLite.getChapter()
 
             ));
-            System.out.println("Успешно добавлено в коллекцию!");
+            ResponseOutputer.append("Успешно добавлено в коллекцию!\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки");
+            ResponseOutputer.append("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки\n");
         }
         return false;
     }

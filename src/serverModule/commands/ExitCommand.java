@@ -18,7 +18,7 @@ public class ExitCommand extends AbstractCommand {
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             return true;
         } catch (WrongAmountOfParametersException exception) {
             System.out.println("У этой команды нет параметров!");

@@ -22,7 +22,7 @@ public class ShowCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             ResponseOutputer.append(collectionManager.showCollection() + "\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {

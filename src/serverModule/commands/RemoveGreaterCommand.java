@@ -5,6 +5,7 @@ import common.exceptions.EmptyCollectionException;
 import common.exceptions.WrongAmountOfParametersException;
 import common.utility.SpaceMarineLite;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +28,7 @@ public class RemoveGreaterCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (!argument.isEmpty() || objectArgument == null) throw new WrongAmountOfParametersException();
             if (collectionManager.collectionSize() == 0) throw new EmptyCollectionException();
             SpaceMarineLite marineLite = (SpaceMarineLite) objectArgument;
             SpaceMarine marineToCompare = new SpaceMarine(
@@ -42,11 +43,12 @@ public class RemoveGreaterCommand extends AbstractCommand{
                     marineLite.getChapter()
             );
             collectionManager.removeGreater(marineToCompare);
+            ResponseOutputer.append("Солдаты успешно удалены!\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("У этой команды нет параметров!");
+            ResponseOutputer.append("У этой команды нет параметров!\n");
         } catch (EmptyCollectionException exception) {
-            System.out.println("Коллекция пуста!");
+            ResponseOutputer.append("Коллекция пуста!\n");
         }
         return false;
     }

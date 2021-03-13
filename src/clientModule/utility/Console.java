@@ -3,9 +3,11 @@ package clientModule.utility;
 import common.data.Chapter;
 import common.data.Coordinates;
 import common.data.Weapon;
+import common.exceptions.IncorrectInputInScriptException;
 import common.exceptions.ScriptRecursionException;
 import common.exceptions.WrongAmountOfParametersException;
 import common.utility.Request;
+import common.utility.ResponseCode;
 import common.utility.SpaceMarineLite;
 
 import java.io.File;
@@ -17,7 +19,8 @@ import java.util.*;
  */
 public class Console {
     private Scanner scanner;
-    private Stack<String> scriptFileNames = new Stack<>();
+    private Stack<File> scriptFileNames = new Stack<>();
+    private Stack<Scanner> scannerStack = new Stack<>();
 
     public Console(Scanner scanner) {
         this.scanner = scanner;
@@ -26,35 +29,76 @@ public class Console {
     /**
      * Mode for catching commands from user input.
      */
-    public Request interactiveMode() {
+    public Request interactiveMode(ResponseCode serverResponseCode) {
+        String userInput;
         String[] userCommand = {"", ""};
         ProcessCode processCode = null;
         try {
             do {
-                System.out.print("$ ");
-                userCommand = (scanner.nextLine().trim() + " ").split(" ", 2);
-                userCommand[1] = userCommand[1].trim();
+                try {
+                    if (fileMode() && (serverResponseCode == ResponseCode.SERVER_EXIT || serverResponseCode == ResponseCode.ERROR)) {
+                        throw new IncorrectInputInScriptException();
+                    }
+                    while (fileMode() && !scanner.hasNextLine()) {
+                        scanner.close();
+                        scanner = scannerStack.pop();
+                        System.out.println("Возвращаюсь из скрипта '" + scriptFileNames.pop().getName() + "'!");
+                    }
+                    if (fileMode()) {
+                        userInput = scanner.nextLine();
+                        if (!userInput.isEmpty()) {
+                            System.out.print("$ ");
+                            System.out.println(userInput);
+                        }
+                    } else {
+                        System.out.print("$ ");
+                        userInput = scanner.nextLine();
+                    }
+                    userCommand = (userInput.trim() + " ").split(" ", 2);
+                    userCommand[1] = userCommand[1].trim();
+                } catch (NoSuchElementException | IllegalStateException exception) {
+                    System.out.println("Произошла ошибка при вводе команды!");
+                    userCommand = new String[]{"", ""};
+                }
                 processCode = checkCommand(userCommand[0], userCommand[1]);
-            } while (processCode == ProcessCode.ERROR || userCommand[0].isEmpty());
-        } catch (Exception e) {
-
-        }
-        try {
-            switch (processCode) {
-                case OBJECT:
-                    SpaceMarineLite marineToInsert = generateMarineToInsert();
-                    return new Request(userCommand[0], userCommand[1], marineToInsert);
-                case UPDATE_OBJECT:
-                    SpaceMarineLite marineToUpdate = generateMarineToUpdate();
-                    return new Request(userCommand[1], userCommand[1], marineToUpdate);
-                case SCRIPT:
-                    break;
+            } while (processCode == ProcessCode.ERROR && !fileMode() || userCommand[0].isEmpty());
+            try {
+                switch (processCode) {
+                    case OBJECT:
+                        SpaceMarineLite marineToInsert = generateMarineToInsert();
+                        return new Request(userCommand[0], userCommand[1], marineToInsert);
+                    case UPDATE_OBJECT:
+                        SpaceMarineLite marineToUpdate = generateMarineToUpdate();
+                        return new Request(userCommand[0], userCommand[1], marineToUpdate);
+                    case SCRIPT:
+                        File scriptFile = new File(userCommand[1]);
+                        if (!scriptFile.exists()) throw new FileNotFoundException();
+                        if (!scriptFileNames.isEmpty() && scriptFileNames.search(scriptFile) != -1) {
+                            throw new ScriptRecursionException();
+                        }
+                        scannerStack.push(scanner);
+                        scriptFileNames.push(scriptFile);
+                        scanner = new Scanner(scriptFile);
+                        System.out.println("Выполняю скрипт '" + scriptFile.getName() + "'!");
+                        break;
+                }
+            } catch (FileNotFoundException exception) {
+                System.out.println("Файл со скриптом не найден!");
+            } catch (ScriptRecursionException exception) {
+                System.out.println("Скрипты не могут вызываться рекурсивно!");
+                throw new IncorrectInputInScriptException();
             }
-        } catch (Exception e) {
-
+        } catch (IncorrectInputInScriptException exception) {
+            System.out.println("Выполнение скрипта прервано!");
+            while (!scannerStack.isEmpty()) {
+                scanner.close();
+                scanner = scannerStack.pop();
+            }
         }
         return new Request(userCommand[0], userCommand[1]);
     }
+
+
 
     /**
      * Launches the command.
@@ -106,6 +150,11 @@ public class Console {
 
     private SpaceMarineLite generateMarineToInsert() {
         SpaceMarineBuilder builder = new SpaceMarineBuilder(scanner);
+        if (fileMode()) {
+            builder.setFileMode();
+        } else {
+            builder.setUserMode();
+        }
         return new SpaceMarineLite(
                 builder.askName(),
                 builder.askCoordinates(),
@@ -119,6 +168,11 @@ public class Console {
 
     private SpaceMarineLite generateMarineToUpdate() {
         SpaceMarineBuilder builder = new SpaceMarineBuilder(scanner);
+        if (fileMode()) {
+            builder.setFileMode();
+        } else {
+            builder.setUserMode();
+        }
         String name = builder.askAboutChangingField("Хотите изменить имя космического солдата?") ?
                 builder.askName() : null;
         Coordinates coordinates = builder.askAboutChangingField("Хотите изменить координаты космического солдата?") ?
@@ -142,5 +196,9 @@ public class Console {
                 weapon,
                 chapter
         );
+    }
+
+    private boolean fileMode() {
+        return !scannerStack.isEmpty();
     }
 }

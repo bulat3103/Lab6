@@ -3,6 +3,7 @@ package serverModule.commands;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.WrongAmountOfParametersException;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 import java.util.List;
 
@@ -24,15 +25,16 @@ public class RemoveLowerKeyCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             if (collectionManager.collectionSize() == 0) throw new EmptyCollectionException();
             int key = Integer.parseInt(argument);
             collectionManager.removeLowerKey(key);
+            ResponseOutputer.append("Солдаты успешно удалены!\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки");
+            ResponseOutputer.append("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки\n");
         } catch (EmptyCollectionException exception) {
-            System.out.println("Коллекция пуста!");
+            ResponseOutputer.append("Коллекция пуста!\n");
         }
         return false;
     }

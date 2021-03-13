@@ -12,6 +12,7 @@ import java.util.Scanner;
  */
 public class SpaceMarineBuilder {
     private Scanner scanner;
+    private boolean fileMode;
 
     public SpaceMarineBuilder(Scanner scanner) {
         this.scanner = scanner;
@@ -32,6 +33,14 @@ public class SpaceMarineBuilder {
         return scanner;
     }
 
+    public void setFileMode() {
+        this.fileMode = true;
+    }
+
+    public void setUserMode() {
+        this.fileMode = false;
+    }
+
     /**
      * Asks a user the marine's name.
      * @return Marine's name.
@@ -43,6 +52,7 @@ public class SpaceMarineBuilder {
                 System.out.println("Введите имя:");
                 System.out.print(">");
                 name = scanner.nextLine().trim();
+                if (fileMode) System.out.println(name);
                 if (name.equals("")) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -65,6 +75,7 @@ public class SpaceMarineBuilder {
                 System.out.print(">");
                 strX = scanner.nextLine().trim();
                 x = Integer.parseInt(strX);
+                if (fileMode) System.out.println(strX);
                 if (x <= -666) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -89,6 +100,7 @@ public class SpaceMarineBuilder {
                 System.out.print(">");
                 strY = scanner.nextLine().trim();
                 y = Float.parseFloat(strY);
+                if (fileMode) System.out.println(strY);
                 if (y <= -603) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -125,6 +137,7 @@ public class SpaceMarineBuilder {
                 System.out.print(">");
                 strHealth = scanner.nextLine().trim();
                 health = Integer.parseInt(strHealth);
+                if (fileMode) System.out.println(strHealth);
                 if (health <= 0) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -149,6 +162,7 @@ public class SpaceMarineBuilder {
                 System.out.print(">");
                 strHeartCount = scanner.nextLine().trim();
                 heartCount = Integer.parseInt(strHeartCount);
+                if (fileMode) System.out.println(strHeartCount);
                 if (heartCount < 0 || heartCount > 3) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -171,6 +185,7 @@ public class SpaceMarineBuilder {
                 System.out.println("Введите достижение:");
                 System.out.print(">");
                 achieve = scanner.nextLine().trim();
+                if (fileMode) System.out.println(achieve);
                 if (achieve.equals("")) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -193,6 +208,7 @@ public class SpaceMarineBuilder {
                 System.out.println("Введите оружие");
                 System.out.print(">");
                 strWeapon = scanner.nextLine().trim();
+                if (fileMode) System.out.println(strWeapon);
                 weapon = Weapon.valueOf(strWeapon.toUpperCase());
                 break;
             } catch (IllegalArgumentException exception) {
@@ -221,6 +237,7 @@ public class SpaceMarineBuilder {
                 System.out.println("Введите имя ордена:");
                 System.out.print(">");
                 name = scanner.nextLine().trim();
+                if (fileMode) System.out.println(name);
                 if (name.equals("")) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
@@ -240,6 +257,7 @@ public class SpaceMarineBuilder {
             System.out.println("Введите имя родительского легиона:");
             System.out.print(">");
             parentLegion = scanner.nextLine().trim();
+            if (fileMode) System.out.println(parentLegion);
             if (parentLegion.equals("")) parentLegion = null;
             break;
         }
@@ -259,6 +277,7 @@ public class SpaceMarineBuilder {
                 System.out.println(res);
                 System.out.print(">");
                 answer = scanner.nextLine().trim();
+                if (fileMode) System.out.println(answer);
                 if (!answer.equals("+") && !answer.equals("-")) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {

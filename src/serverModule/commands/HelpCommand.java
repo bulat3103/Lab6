@@ -1,6 +1,7 @@
 package serverModule.commands;
 
 import common.exceptions.WrongAmountOfParametersException;
+import serverModule.utility.ResponseOutputer;
 
 /**
  * Command 'help'. Checks for wrong arguments then do nothing.
@@ -18,10 +19,10 @@ public class HelpCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("У этой команды нет параметров!");
+            ResponseOutputer.append("У этой команды нет параметров!\n");
         }
         return false;
     }

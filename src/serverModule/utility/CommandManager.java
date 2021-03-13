@@ -20,7 +20,6 @@ public class CommandManager {
     private AbstractCommand updateCommand;
     private AbstractCommand removeKeyCommand;
     private AbstractCommand clearCommand;
-    private AbstractCommand saveCommand;
     private AbstractCommand executeScriptCommand;
     private AbstractCommand exitCommand;
     private AbstractCommand removeGreaterCommand;
@@ -30,7 +29,7 @@ public class CommandManager {
     private AbstractCommand sumOfHealthCommand;
     private AbstractCommand averageOfHeartCountCommand;
 
-    public CommandManager(AbstractCommand helpCommand, AbstractCommand infoCommand, AbstractCommand showCommand, AbstractCommand insertCommand, AbstractCommand updateCommand, AbstractCommand removeKeyCommand, AbstractCommand clearCommand, AbstractCommand saveCommand, AbstractCommand executeScriptCommand, AbstractCommand exitCommand, AbstractCommand removeGreaterCommand, AbstractCommand historyCommand, AbstractCommand removeLowerKeyCommand, AbstractCommand removeAllByWeaponTypeCommand, AbstractCommand sumOfHealthCommand, AbstractCommand averageOfHeartCountCommand) {
+    public CommandManager(AbstractCommand helpCommand, AbstractCommand infoCommand, AbstractCommand showCommand, AbstractCommand insertCommand, AbstractCommand updateCommand, AbstractCommand removeKeyCommand, AbstractCommand clearCommand, AbstractCommand executeScriptCommand, AbstractCommand exitCommand, AbstractCommand removeGreaterCommand, AbstractCommand historyCommand, AbstractCommand removeLowerKeyCommand, AbstractCommand removeAllByWeaponTypeCommand, AbstractCommand sumOfHealthCommand, AbstractCommand averageOfHeartCountCommand) {
         this.helpCommand = helpCommand;
         commands.add(helpCommand);
         this.infoCommand = infoCommand;
@@ -45,8 +44,6 @@ public class CommandManager {
         commands.add(removeKeyCommand);
         this.clearCommand = clearCommand;
         commands.add(clearCommand);
-        this.saveCommand = saveCommand;
-        commands.add(saveCommand);
         this.executeScriptCommand = executeScriptCommand;
         commands.add(executeScriptCommand);
         this.exitCommand = exitCommand;
@@ -146,15 +143,6 @@ public class CommandManager {
      */
     public boolean clear(String argument, Object objectArgument) {
         return clearCommand.execute(argument, objectArgument);
-    }
-
-    /**
-     * Executes needed command.
-     * @param argument Its argument.
-     * @return Command exit status.
-     */
-    public boolean save(String argument, Object objectArgument) {
-        return saveCommand.execute(argument, objectArgument);
     }
 
     /**

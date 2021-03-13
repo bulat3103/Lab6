@@ -42,9 +42,6 @@ public class RequestManager {
             case "clear":
                 if (!commandManager.clear(argument, objectArgument)) return ResponseCode.ERROR;
                 break;
-            case "save":
-                if (!commandManager.save(argument, objectArgument)) return ResponseCode.ERROR;
-                break;
             case "execute_script":
                 if (!commandManager.executeScript(argument, objectArgument)) return ResponseCode.ERROR;
                 break;

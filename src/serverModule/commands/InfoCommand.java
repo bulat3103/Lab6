@@ -2,6 +2,7 @@ package serverModule.commands;
 
 import common.exceptions.WrongAmountOfParametersException;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 import java.time.LocalDateTime;
 
@@ -20,16 +21,17 @@ public class InfoCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try{
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             LocalDateTime lastInitTime = collectionManager.getLastInitTime();
             String lastInitTimeString = (lastInitTime == null) ? "в данной сессии инициализации еще не происходило" :
                                         lastInitTime.toLocalDate().toString() + " " + lastInitTime.toLocalTime().toString();
-            System.out.println("Информация о коллекции:");
-            System.out.println(" Тип: " + collectionManager.collectionType());
-            System.out.println(" Количество элементов: " + collectionManager.collectionSize());
-            System.out.println(" Дата последней инициализации: " + lastInitTimeString);
+            ResponseOutputer.append("Информация о коллекции:\n");
+            ResponseOutputer.append(" Тип: " + collectionManager.collectionType() + "\n");
+            ResponseOutputer.append(" Количество элементов: " + collectionManager.collectionSize() + "\n");
+            ResponseOutputer.append(" Дата последней инициализации: " + lastInitTimeString + "\n");
+            return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("У этой команды нет параметров!");
+            ResponseOutputer.append("У этой команды нет параметров!\n");
         }
         return false;
     }

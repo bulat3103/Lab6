@@ -2,6 +2,7 @@ package serverModule.commands;
 
 import common.exceptions.WrongAmountOfParametersException;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 /**
  * Command 'clear'. Clears the collection.
@@ -21,11 +22,12 @@ public class ClearCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if(!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if(!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             collectionManager.clearCollection();
+            ResponseOutputer.append("Коллекция успешно очищена!\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("У этой команды нет параметров!");
+            ResponseOutputer.append("У этой команды нет параметров!\n");
         }
         return false;
     }

@@ -3,6 +3,7 @@ package serverModule.commands;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.WrongAmountOfParametersException;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 /**
  * Command 'average_of_heart_count'. Outputs the average value of the heartCount field for all items in the collection.
@@ -22,15 +23,15 @@ public class AverageOfHeartCountCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
-            double average_of_heart_count = collectionManager.averageOfHealthCount();
+            if (!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
+            double average_of_heart_count = collectionManager.averageOfHeartCount();
             if (average_of_heart_count == 0) throw new EmptyCollectionException();
-            System.out.println("Среднее значение поля heartCount всех космических десантов: " + average_of_heart_count);
+            ResponseOutputer.append("Среднее значение поля heartCount всех космических десантов: " + average_of_heart_count + "\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("У этой команды нет параметров!");
+            ResponseOutputer.append("У этой команды нет параметров!\n");
         } catch (EmptyCollectionException exception) {
-            System.out.println("Коллекция пуста!");
+            ResponseOutputer.append("Коллекция пуста!\n");
         }
         return false;
     }

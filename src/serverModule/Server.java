@@ -5,11 +5,8 @@ import common.utility.Response;
 import common.utility.ResponseCode;
 import serverModule.utility.RequestManager;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
-import java.nio.channels.DatagramChannel;
-import java.util.Arrays;
 
 public class Server {
     private int port;
@@ -30,26 +27,26 @@ public class Server {
         }
     }
 
-    private boolean processingClientRequest() throws IOException, ClassNotFoundException {
+    private boolean processingClientRequest(){
         Request request = null;
         Response response = null;
-        //try {
+        try {
             socket = new DatagramSocket(8090);
             do {
                 byte[] getBuffer = new byte[socket.getReceiveBufferSize()];
                 DatagramPacket getPacket = new DatagramPacket(getBuffer, getBuffer.length);
                 socket.receive(getPacket);
                 request = deserialize(getPacket, getBuffer);
-                System.out.println("Получена команда: " + request.getCommandName());
+                System.out.println("Получена команда '" + request.getCommandName() + "'");
                 response = executeRequest(request);
+                System.out.println("Команда '" + request.getCommandName() + "' выполнена");
                 byte[] sendBuffer = serialize(response);
                 DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, getPacket.getAddress(), getPacket.getPort());
                 socket.send(sendPacket);
-                System.out.println("Ответ на запрос '" + request.getCommandName() +"' отправлен");
             } while (response.getResponseCode() != ResponseCode.SERVER_EXIT);
             return false;
-        //} catch (IOException | ClassNotFoundException exception) {}
-        //return true;
+        } catch (IOException | ClassNotFoundException exception) {}
+        return true;
     }
 
     private Response executeRequest(Request request) {

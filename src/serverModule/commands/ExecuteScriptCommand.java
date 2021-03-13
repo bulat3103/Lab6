@@ -1,6 +1,7 @@
 package serverModule.commands;
 
 import common.exceptions.WrongAmountOfParametersException;
+import serverModule.utility.ResponseOutputer;
 
 /**
  * Command 'execute_script'. Executes scripts from a file. Actually only checks argument and prints messages.
@@ -18,11 +19,10 @@ public class ExecuteScriptCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (argument.isEmpty()) throw new WrongAmountOfParametersException();
-            System.out.println("Скрипт выполняется!");
+            if (argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             return true;
         } catch (WrongAmountOfParametersException exception) {
-            System.out.println("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки");
+            ResponseOutputer.append("Вместе с этой командой должен быть передан параметр! Наберит 'help' для справки\n");
         }
         return false;
     }

@@ -3,6 +3,7 @@ package serverModule.commands;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.WrongAmountOfParametersException;
 import serverModule.utility.CollectionManager;
+import serverModule.utility.ResponseOutputer;
 
 /**
  * Command 'sum_of_health'. Prints the sum of health of all marines.
@@ -22,10 +23,10 @@ public class SumOfHealthCommand extends AbstractCommand{
     @Override
     public boolean execute(String argument, Object objectArgument) {
         try {
-            if (!argument.isEmpty()) throw new WrongAmountOfParametersException();
+            if (!argument.isEmpty() || objectArgument != null) throw new WrongAmountOfParametersException();
             double sum_of_health = collectionManager.getSumOfHealth();
             if (sum_of_health == 0) throw new EmptyCollectionException();
-            System.out.println("Сумма здоровья всех космических десантов: " + sum_of_health);
+            ResponseOutputer.append("Сумма здоровья всех космических десантов: " + sum_of_health + "\n");
             return true;
         } catch (WrongAmountOfParametersException exception) {
             System.out.println("У этой команды нет параметров!");

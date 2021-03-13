@@ -1,9 +1,11 @@
 package common.data;
 
+import java.io.Serializable;
+
 /**
  * Enumeration with marine weapon constants.
  */
-public enum Weapon {
+public enum Weapon implements Serializable {
     HEAVY_BOLTGUN,
     FLAMER,
     GRENADE_LAUNCHER;

@@ -7,15 +7,12 @@ import serverModule.utility.FileManager;
 import serverModule.utility.RequestManager;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
 
 public class App {
     public static final int PORT = 1821;
-    public static final String fileName = "data.json";
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        FileManager fileManager = new FileManager(fileName);
+        FileManager fileManager = new FileManager("data.json");
         CollectionManager collectionManager = new CollectionManager(fileManager);
         CommandManager commandManager = new CommandManager(new HelpCommand(),
                 new InfoCommand(collectionManager),
@@ -24,7 +21,6 @@ public class App {
                 new UpdateCommand(collectionManager),
                 new RemoveKeyCommand(collectionManager),
                 new ClearCommand(collectionManager),
-                new SaveCommand(collectionManager),
                 new ExecuteScriptCommand(),
                 new ExitCommand(),
                 new RemoveGreaterCommand(collectionManager),
@@ -36,5 +32,6 @@ public class App {
         RequestManager requestManager = new RequestManager(commandManager);
         Server server = new Server(8090, requestManager);
         server.run();
+        collectionManager.saveCollection();
     }
 }

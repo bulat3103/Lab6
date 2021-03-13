@@ -4,10 +4,8 @@ import common.data.SpaceMarine;
 import common.data.Weapon;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Operates the collection itself.
@@ -25,7 +23,7 @@ public class CollectionManager {
     }
 
     /**
-     * @return The collecton itself.
+     * @return The collection itself.
      */
     public TreeMap<Integer, SpaceMarine> getCollection() {
         return marines;
@@ -92,11 +90,7 @@ public class CollectionManager {
      * @param keyToCompare The key used to take the all marines' keys, which are smaller than key in parameters.
      */
     public void removeLowerKey(int keyToCompare) {
-        /*List<Integer> list = new ArrayList<>();
-        for (Map.Entry<Integer, SpaceMarine> e : marines.entrySet()) {
-            if (e.getKey() < key) list.add(e.getKey());
-        }
-        return list;*/
+        marines.entrySet().removeIf(entry -> entry.getKey() < keyToCompare);
     }
 
     /**
@@ -134,10 +128,7 @@ public class CollectionManager {
      * @return A marine's key.
      */
     public Integer getKeyById(int id) {
-        for (Map.Entry<Integer, SpaceMarine> e : marines.entrySet()) {
-            if (e.getValue().getId() == id) return e.getKey();
-        }
-        return null;
+        return marines.entrySet().stream().filter(entry -> entry.getValue().getId() == id).map(Map.Entry::getKey).findFirst().get();
     }
 
     /**
@@ -150,7 +141,7 @@ public class CollectionManager {
     /**
      * @return Average of healthCount.
      */
-    public double averageOfHealthCount() {
+    public double averageOfHeartCount() {
         double average = (double) marines.values().stream().reduce(0, (sum, p) -> sum += p.getHeartCount(), Integer::sum);
         if (average == 0) return 0;
         return average / marines.size();
