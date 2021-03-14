@@ -1,18 +1,15 @@
 package serverModule;
 
 import serverModule.commands.*;
-import serverModule.utility.CollectionManager;
-import serverModule.utility.CommandManager;
-import serverModule.utility.FileManager;
-import serverModule.utility.RequestManager;
+import serverModule.utility.*;
 
 import java.io.IOException;
 
 public class App {
-    public static final int PORT = 1821;
+    public static final int PORT = 8090;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        FileManager fileManager = new FileManager("data.json");
+    public static void main(String[] args) {
+        FileManager fileManager = new FileManager();
         CollectionManager collectionManager = new CollectionManager(fileManager);
         CommandManager commandManager = new CommandManager(new HelpCommand(),
                 new InfoCommand(collectionManager),
@@ -27,10 +24,12 @@ public class App {
                 new HistoryCommand(),
                 new RemoveLowerKeyCommand(collectionManager),
                 new RemoveAllByWeaponTypeCommand(collectionManager),
+                new SaveCommand(collectionManager),
                 new SumOfHealthCommand(collectionManager),
-                new AverageOfHeartCountCommand(collectionManager));
+                new AverageOfHeartCountCommand(collectionManager),
+                new LoadCollectionCommand(collectionManager));
         RequestManager requestManager = new RequestManager(commandManager);
-        Server server = new Server(8090, requestManager);
+        Server server = new Server(PORT, requestManager);
         server.run();
         collectionManager.saveCollection();
     }

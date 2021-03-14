@@ -21,6 +21,9 @@ public class RequestManager {
         switch (command) {
             case "":
                 break;
+            case "loadCollection":
+                if (!commandManager.loadCollection(argument, objectArgument)) return ResponseCode.ERROR;
+                break;
             case "help":
                 if (!commandManager.help(argument, objectArgument)) return ResponseCode.ERROR;
                 break;
@@ -65,6 +68,9 @@ public class RequestManager {
                 break;
             case "average_of_heart_count":
                 if (!commandManager.averageOfHeartCount(argument, objectArgument)) return ResponseCode.ERROR;
+                break;
+            case "save":
+                if (!commandManager.save(argument, objectArgument)) return ResponseCode.ERROR;
                 break;
             default:
                 ResponseOutputer.append("Команда '" + command + "' не найдена. Наберите 'help' для справки.\n");

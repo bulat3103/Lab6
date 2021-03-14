@@ -26,10 +26,12 @@ public class CommandManager {
     private AbstractCommand historyCommand;
     private AbstractCommand removeLowerKeyCommand;
     private AbstractCommand removeAllByWeaponTypeCommand;
+    private AbstractCommand saveCommand;
     private AbstractCommand sumOfHealthCommand;
     private AbstractCommand averageOfHeartCountCommand;
+    private AbstractCommand loadCollection;
 
-    public CommandManager(AbstractCommand helpCommand, AbstractCommand infoCommand, AbstractCommand showCommand, AbstractCommand insertCommand, AbstractCommand updateCommand, AbstractCommand removeKeyCommand, AbstractCommand clearCommand, AbstractCommand executeScriptCommand, AbstractCommand exitCommand, AbstractCommand removeGreaterCommand, AbstractCommand historyCommand, AbstractCommand removeLowerKeyCommand, AbstractCommand removeAllByWeaponTypeCommand, AbstractCommand sumOfHealthCommand, AbstractCommand averageOfHeartCountCommand) {
+    public CommandManager(AbstractCommand helpCommand, AbstractCommand infoCommand, AbstractCommand showCommand, AbstractCommand insertCommand, AbstractCommand updateCommand, AbstractCommand removeKeyCommand, AbstractCommand clearCommand, AbstractCommand executeScriptCommand, AbstractCommand exitCommand, AbstractCommand removeGreaterCommand, AbstractCommand historyCommand, AbstractCommand removeLowerKeyCommand, AbstractCommand removeAllByWeaponTypeCommand, AbstractCommand saveCommand, AbstractCommand sumOfHealthCommand, AbstractCommand averageOfHeartCountCommand, AbstractCommand loadCollection) {
         this.helpCommand = helpCommand;
         commands.add(helpCommand);
         this.infoCommand = infoCommand;
@@ -56,10 +58,13 @@ public class CommandManager {
         commands.add(removeLowerKeyCommand);
         this.removeAllByWeaponTypeCommand = removeAllByWeaponTypeCommand;
         commands.add(removeAllByWeaponTypeCommand);
+        this.saveCommand = saveCommand;
+        commands.add(saveCommand);
         this.sumOfHealthCommand = sumOfHealthCommand;
         commands.add(sumOfHealthCommand);
         this.averageOfHeartCountCommand = averageOfHeartCountCommand;
         commands.add(averageOfHeartCountCommand);
+        this.loadCollection = loadCollection;
     }
 
     /**
@@ -109,6 +114,10 @@ public class CommandManager {
         return showCommand.execute(argument, objectArgument);
     }
 
+    public boolean loadCollection(String argument, Object objectArgument) {
+        return loadCollection.execute(argument, objectArgument);
+    }
+
     /**
      * Executes needed command.
      * @param argument Its argument.
@@ -134,6 +143,15 @@ public class CommandManager {
      */
     public boolean removeKey(String argument, Object objectArgument) {
         return removeKeyCommand.execute(argument, objectArgument);
+    }
+
+    /**
+     * Executes needed command.
+     * @param argument Its argument.
+     * @return Command exit status.
+     */
+    public boolean save(String argument, Object objectArgument) {
+        return saveCommand.execute(argument, objectArgument);
     }
 
     /**

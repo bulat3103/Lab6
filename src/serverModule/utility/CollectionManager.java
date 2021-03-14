@@ -18,8 +18,6 @@ public class CollectionManager {
     public CollectionManager(FileManager fileManager) {
         this.lastInitTime = null;
         this.fileManager = fileManager;
-
-        loadCollection();
     }
 
     /**
@@ -32,8 +30,8 @@ public class CollectionManager {
     /**
      * Loads the collection from file.
      */
-    private void loadCollection() {
-        marines = fileManager.readCollection();
+    public void loadCollection(String fileName) {
+        marines = fileManager.readCollection(fileName);
         lastInitTime = LocalDateTime.now();
     }
 

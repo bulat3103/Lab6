@@ -7,21 +7,40 @@ import serverModule.utility.RequestManager;
 
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 public class Server {
     private int port;
     private RequestManager requestManager;
     private DatagramSocket socket;
-    private SocketAddress address;
+    private InetAddress address;
+    private Scanner scanner;
 
     public Server(int port, RequestManager requestManager) {
         this.port = port;
         this.requestManager = requestManager;
     }
 
-    public void run() throws IOException, ClassNotFoundException {
+    public void run() {
         System.out.println("Запуск сервера!");
         boolean processStatus = true;
+        scanner = new Scanner(System.in);
+        Runnable userInput = () -> {
+            try {
+                while (true) {
+                    String[] userCommand = (scanner.nextLine().trim() + " ").split(" ", 2);
+                    userCommand[1] = userCommand[1].trim();
+                    if (!userCommand[0].equals("save")) {
+                        System.out.println("Сервер не может сам принимать такую команду!");
+                        return;
+                    }
+                    Response response = executeRequest(new Request(userCommand[0], userCommand[1]));
+                    System.out.println(response.getResponseBody());
+                }
+            } catch (Exception e) {}
+        };
+        Thread thread = new Thread(userInput);
+        thread.start();
         while (processStatus) {
             processStatus = processingClientRequest();
         }
@@ -32,26 +51,38 @@ public class Server {
         Response response = null;
         try {
             socket = new DatagramSocket(8090);
+            scanner = new Scanner(System.in);
             do {
-                byte[] getBuffer = new byte[socket.getReceiveBufferSize()];
-                DatagramPacket getPacket = new DatagramPacket(getBuffer, getBuffer.length);
-                socket.receive(getPacket);
-                request = deserialize(getPacket, getBuffer);
+                request = getRequest();
                 System.out.println("Получена команда '" + request.getCommandName() + "'");
                 response = executeRequest(request);
                 System.out.println("Команда '" + request.getCommandName() + "' выполнена");
-                byte[] sendBuffer = serialize(response);
-                DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, getPacket.getAddress(), getPacket.getPort());
-                socket.send(sendPacket);
+                sendResponse(response);
             } while (response.getResponseCode() != ResponseCode.SERVER_EXIT);
             return false;
-        } catch (IOException | ClassNotFoundException exception) {}
+        } catch (IOException | ClassNotFoundException exception) {
+            System.out.println("Произошла ошибка при работе с клиентом!");
+        }
         return true;
     }
 
+    private Request getRequest() throws IOException, ClassNotFoundException {
+        byte[] getBuffer = new byte[socket.getReceiveBufferSize()];
+        DatagramPacket getPacket = new DatagramPacket(getBuffer, getBuffer.length);
+        socket.receive(getPacket);
+        address = getPacket.getAddress();
+        port = getPacket.getPort();
+        return deserialize(getPacket, getBuffer);
+    }
+
+    private void sendResponse(Response response) throws IOException {
+        byte[] sendBuffer = serialize(response);
+        DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, address, port);
+        socket.send(sendPacket);
+    }
+
     private Response executeRequest(Request request) {
-        Response response = requestManager.manage(request);
-        return response;
+        return requestManager.manage(request);
     }
 
     private Request deserialize(DatagramPacket getPacket, byte[] buffer) throws IOException, ClassNotFoundException {

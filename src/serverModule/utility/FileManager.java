@@ -20,23 +20,18 @@ public class FileManager {
     private Gson gson = new Gson();
     private String fileName;
 
-    public FileManager(String fileName) {
-        this.fileName = fileName;
-    }
-
     /**
      * Writes collection to a file.
      * @param collection Collection to write.
      */
     public void writeCollection(TreeMap<Integer, SpaceMarine> collection) {
         File file = new File(this.fileName);
-        if (!file.canRead()) {
+        if (file.exists() && !file.canWrite()) {
             System.out.println("Ошибка записи. Проверьте права на данный файл!");
             return;
         }
         try (PrintWriter pw = new PrintWriter(this.fileName)){
             pw.write(gson.toJson(collection));
-            System.out.println("Коллекция успешна сохранена в файл!");
         } catch (IllegalStateException exception) {
             System.out.println("Ошибка считывания. Проверьте права на данный файл!");
         } catch (FileNotFoundException e) {
@@ -48,24 +43,25 @@ public class FileManager {
      * Reads collection from a file.
      * @return Readed collection.
      */
-    public TreeMap<Integer, SpaceMarine> readCollection() {
+    public TreeMap<Integer, SpaceMarine> readCollection(String fileName) {
+        this.fileName = fileName;
         File file = new File(this.fileName);
-        if (!file.canRead()) {
-            System.out.println("Ошибка считывания. Проверьте права на данный файл!");
+        if (file.exists() && !file.canRead()) {
+            ResponseOutputer.append("Ошибка считывания. Проверьте права на данный файл!\n");
             return new TreeMap<>();
         }
         try (Scanner fileScanner = new Scanner(new File(this.fileName))){
             TreeMap<Integer, SpaceMarine> collection;
             Type collectionType = new TypeToken<TreeMap<Integer, SpaceMarine>>() {}.getType();
             collection = gson.fromJson(fileScanner.nextLine().trim(), collectionType);
-            System.out.println("Коллекция успешна загружена!");
+            ResponseOutputer.append("Коллекция успешна загружена!\n");
             return collection;
         } catch (FileNotFoundException e) {
-            System.out.println("Загрузочный файл не найден!");
+            ResponseOutputer.append("Загрузочный файл не найден!\n");
         } catch (NoSuchElementException e) {
-            System.out.println("Загрузочный файл пуст!");
+            ResponseOutputer.append("Загрузочный файл пуст!\n");
         } catch (JsonParseException | NullPointerException exception) {
-            System.out.println("В загрузочном файле не обнаружена необходимая коллекция!");
+            ResponseOutputer.append("В загрузочном файле не обнаружена необходимая коллекция!\n");
         }
         return new TreeMap<>();
     }
