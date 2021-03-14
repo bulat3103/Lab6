@@ -8,6 +8,10 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.Iterator;
+import java.util.Set;
 
 public class Client {
     private String host;
@@ -16,6 +20,7 @@ public class Client {
     private DatagramChannel datagramChannel;
     private SocketAddress address;
     private ByteBuffer byteBuffer = ByteBuffer.allocate(16384);
+    private Selector selector;
 
     public Client(String host, int port, Console console) {
         this.host = host;
@@ -28,9 +33,11 @@ public class Client {
             datagramChannel = DatagramChannel.open();
             address = new InetSocketAddress("localhost", this.port);
             datagramChannel.connect(address);
-            Request loadCollection = new Request("loadCollection", fileName);
-            sendRequest(loadCollection);
-            Response responseLoading = getResponse();
+            datagramChannel.configureBlocking(false);
+            selector = Selector.open();
+            datagramChannel.register(selector, SelectionKey.OP_WRITE);
+            send(new Request("loadCollection", fileName));
+            Response responseLoading = receive();
             System.out.print(responseLoading.getResponseBody());
             Request requestToServer = null;
             Response serverResponse = null;
@@ -38,30 +45,19 @@ public class Client {
                 requestToServer = serverResponse != null ? console.interactiveMode(serverResponse.getResponseCode()) :
                         console.interactiveMode(null);
                 if (requestToServer.isEmpty()) continue;
-                sendRequest(requestToServer);
-                serverResponse = getResponse();
+                send(requestToServer);
+                serverResponse = receive();
                 System.out.print(serverResponse.getResponseBody());
             } while(!requestToServer.getCommandName().equals("exit"));
-            System.out.println("Работа клиента успешно завершена!");
         } catch (IOException | ClassNotFoundException exception) {
             System.out.println("Произошла ошибка при работе с сервером!");
             System.exit(0);
         }
     }
 
-    private void sendRequest(Request requestToServer) throws IOException {
-        byteBuffer.put(serialize(requestToServer));
+    private void makeByteBufferToRequest(Request request) throws IOException {
+        byteBuffer.put(serialize(request));
         byteBuffer.flip();
-        datagramChannel.send(byteBuffer, address);
-        byteBuffer.clear();
-    }
-
-    private Response getResponse() throws IOException, ClassNotFoundException {
-        datagramChannel.receive(byteBuffer);
-        byteBuffer.flip();
-        Response serverResponse = deserialize(byteBuffer);
-        byteBuffer.clear();
-        return serverResponse;
     }
 
     private byte[] serialize(Request request) throws IOException {
@@ -76,12 +72,49 @@ public class Client {
         return buffer;
     }
 
-    private Response deserialize(ByteBuffer byteBuffer) throws IOException, ClassNotFoundException {
+    private Response deserialize() throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteBuffer.array());
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         Response response = (Response) objectInputStream.readObject();
         byteArrayInputStream.close();
         objectInputStream.close();
+        byteBuffer.clear();
         return response;
+    }
+
+    private void send(Request request) throws IOException {
+        makeByteBufferToRequest(request);
+        DatagramChannel channel = null;
+        while (channel == null) {
+            selector.select();
+            Set<SelectionKey> selectionKeys = selector.selectedKeys();
+            for (SelectionKey key : selectionKeys) {
+                if (key.isWritable()) {
+                    channel = (DatagramChannel) key.channel();
+                    channel.write(byteBuffer);
+                    channel.register(selector, SelectionKey.OP_READ);
+                    break;
+                }
+            }
+        }
+        byteBuffer.clear();
+    }
+
+    private Response receive() throws IOException, ClassNotFoundException {
+        DatagramChannel channel = null;
+        while (channel == null) {
+            selector.select();
+            Set<SelectionKey> selectionKeys = selector.selectedKeys();
+            for (SelectionKey key : selectionKeys) {
+                if (key.isReadable()) {
+                    channel = (DatagramChannel) key.channel();
+                    channel.read(byteBuffer);
+                    byteBuffer.flip();
+                    channel.register(selector, SelectionKey.OP_WRITE);
+                    break;
+                }
+            }
+        }
+        return deserialize();
     }
 }

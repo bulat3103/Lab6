@@ -12,7 +12,7 @@ public class App {
     private static int port;
     private static String fileName;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) {
         //if (!checkArgs(args)) return;
         System.out.println("Клиент запущен");
         Scanner scanner = new Scanner(System.in);
